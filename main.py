@@ -40,6 +40,12 @@ def aadhar():
 
             if y + cropped.height > A4_HEIGHT:
                 break
+            
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
 
 #for nsdl pan card
 @app.route("/nsdlPan", methods=["POST"])
@@ -72,6 +78,12 @@ def nsdlPan():
 
             if y + cropped.height > A4_HEIGHT:
                 break
+
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
 
 
 
