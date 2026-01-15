@@ -1,9 +1,12 @@
 from pdf2image import convert_from_path, convert_from_bytes
 from PIL import Image
 from flask import Flask, send_file, request
+from flask_cors import CORS
 from io import BytesIO
 
 app = Flask(__name__)
+
+CORS(app)
 
 @app.route("/test")
 def test():
@@ -41,6 +44,12 @@ def aadhar():
             if y + cropped.height > A4_HEIGHT:
                 break
 
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
+
 #for nsdl pan card
 @app.route("/nsdlPan", methods=["POST"])
 def nsdlPan():
@@ -72,6 +81,12 @@ def nsdlPan():
 
             if y + cropped.height > A4_HEIGHT:
                 break
+
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
 
 
 
