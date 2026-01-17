@@ -44,6 +44,12 @@ def aadhar():
 
             if y + cropped.height > A4_HEIGHT:
                 break
+            
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
 
     img_buffer = BytesIO()
     a4_page.save(img_buffer, "JPEG", quality=100)
@@ -171,6 +177,3 @@ def pvcAadhar():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-#ab mai noob nhi raha :) namannnnn 
