@@ -3,6 +3,7 @@ from PIL import Image
 from flask import Flask, send_file, request
 from flask_cors import CORS
 from io import BytesIO
+import zipfile
 
 app = Flask(__name__)
 
@@ -128,6 +129,45 @@ def utiPan():
 
     return send_file(img_buffer, mimetype="image/jpeg")
 
+#for pvc aadhar card
+@app.route("/pvcAadhar", methods=["POST"])
+def pvcAadhar():
+
+    pdf = request.files["File"]
+    images = convert_from_bytes(pdf.read(), dpi=300, fmt="jpg")
+
+    zip_buffer = BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+
+        img = images[0]
+
+        # ---------- FRONT ----------
+        front = img.crop((200, 2385, 1260, 3060))
+        front = front.resize((1017, 639))
+
+        front_buffer = BytesIO()
+        front.save(front_buffer, "JPEG", quality=100)
+
+        zipf.writestr("aadhar_front.jpg", front_buffer.getvalue())
+
+        # ---------- BACK ----------
+        back = img.crop((1293, 2383, 2351,3063))  # adjust coords
+        back = back.resize((1017, 639))
+
+        back_buffer = BytesIO()
+        back.save(back_buffer, "JPEG", quality=100)
+
+        zipf.writestr("aadhar_back.jpg", back_buffer.getvalue())
+
+    zip_buffer.seek(0)
+
+    return send_file(
+        zip_buffer,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name="aadhar_pvc.zip"
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)
