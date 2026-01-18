@@ -126,5 +126,37 @@ def utiPan():
     return send_file(img_buffer, mimetype="image/jpeg")
 
 
+
+#for aadhar card
+@app.route("/pawan", methods=["POST"])
+def pawan():
+
+    A4_WIDTH = 2480
+    A4_HEIGHT = 3508
+    y = 20
+
+    a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
+
+    pawanPDF = request.files.getlist("File")
+
+    for pdf in pawanPDF:
+        images = convert_from_bytes(pdf.read(), dpi=300, fmt="jpg")
+
+        for i, img in enumerate(images):
+
+            x = (A4_WIDTH - img.width) // 2
+            a4_page.paste(img, (x, y))
+            y += img.height + 20
+
+            if y + cropped.height > A4_HEIGHT:
+                break
+            
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
