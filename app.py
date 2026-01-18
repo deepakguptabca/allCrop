@@ -176,13 +176,14 @@ def pvcAadhar():
     )
 
 
-#for aadhar card
+#for pawan qr prints
 @app.route("/pawan", methods=["POST"])
 def pawan():
 
     A4_WIDTH = 2480
     A4_HEIGHT = 3508
     y = 20
+    x = 20
 
     a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
 
@@ -193,11 +194,12 @@ def pawan():
 
         for i, img in enumerate(images):
 
-            x = (A4_WIDTH - img.width) // 2
-            a4_page.paste(img, (x, y))
-            y += img.height + 20
+            resized = img.resize((943,1277))
 
-            if y + cropped.height > A4_HEIGHT:
+            a4_page.paste(resized, (x, y))
+            y += resized.height + 20
+
+            if y + resized.height > A4_HEIGHT:
                 break
             
     img_buffer = BytesIO()
