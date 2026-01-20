@@ -135,6 +135,7 @@ def utiPan():
 
     return send_file(img_buffer, mimetype="image/jpeg")
 
+
 #for pvc aadhar card
 @app.route("/pvcAadhar", methods=["POST"])
 def pvcAadhar():
@@ -182,24 +183,101 @@ def pawan():
 
     A4_WIDTH = 2480
     A4_HEIGHT = 3508
+
+    IMG_W = 943
+    IMG_H = 1277
+    GAP = 40
+
+    # fixed positions for 2×2 layout
+    positions = [
+        (GAP, GAP),
+        (IMG_W + GAP * 2, GAP),
+        (GAP, IMG_H + GAP * 2),
+        (IMG_W + GAP * 2, IMG_H + GAP * 2)
+    ]
+
+    files = request.files.getlist("File")
+
+    zip_buffer = BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+
+        page_no = 1
+        img_index = 0
+
+        a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
+
+        for pdf in files:
+            images = convert_from_bytes(pdf.read(), dpi=300, fmt="jpg")
+
+            for img in images:
+
+                resized = img.resize((IMG_W, IMG_H))
+
+                x, y = positions[img_index]
+                a4_page.paste(resized, (x, y))
+                img_index += 1
+
+                # ✅ Page full (4 images)
+                if img_index == 4:
+                    buffer = BytesIO()
+                    a4_page.save(buffer, "JPEG", quality=100)
+                    buffer.seek(0)
+
+                    zipf.writestr(f"page_{page_no}.jpg", buffer.getvalue())
+
+                    # reset for next page
+                    page_no += 1
+                    img_index = 0
+                    a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
+
+        # ✅ Save last page if images remain
+        if img_index > 0:
+            buffer = BytesIO()
+            a4_page.save(buffer, "JPEG", quality=100)
+            buffer.seek(0)
+            zipf.writestr(f"page_{page_no}.jpg", buffer.getvalue())
+
+    zip_buffer.seek(0)
+
+    return send_file(
+        zip_buffer,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name="pawan_a4_pages.zip"
+    )
+
+
+#for voter card
+@app.route("/voter", methods=["POST"])
+def voter():
+
+    A4_WIDTH = 2480
+    A4_HEIGHT = 3508
     y = 20
-    x = 20
 
     a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
 
-    pawanPDF = request.files.getlist("File")
+    voterPDF = request.files.getlist("File")
 
-    for pdf in pawanPDF:
+    for pdf in voterPDF:
         images = convert_from_bytes(pdf.read(), dpi=300, fmt="jpg")
 
         for i, img in enumerate(images):
 
-            resized = img.resize((943,1277))
+            # crop part
+            left = 134
+            top = 393
+            right = 2386
+            bottom = 1039
 
-            a4_page.paste(resized, (x, y))
-            y += resized.height + 20
+            cropped = img.crop((left, top, right, bottom))
 
-            if y + resized.height > A4_HEIGHT:
+            x = (A4_WIDTH - cropped.width) // 2
+            a4_page.paste(cropped, (x, y))
+            y += cropped.height + 20
+
+            if y + cropped.height > A4_HEIGHT:
                 break
             
     img_buffer = BytesIO()
@@ -208,6 +286,11 @@ def pawan():
 
     return send_file(img_buffer, mimetype="image/jpeg")
 
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg")
 
 if __name__ == "__main__":
     app.run(debug=True)
