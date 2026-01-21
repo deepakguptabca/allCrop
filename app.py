@@ -286,11 +286,6 @@ def voter():
 
     return send_file(img_buffer, mimetype="image/jpeg")
 
-    img_buffer = BytesIO()
-    a4_page.save(img_buffer, "JPEG", quality=100)
-    img_buffer.seek(0)
-
-    return send_file(img_buffer, mimetype="image/jpeg")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+     app.run(host="0.0.0.0", port=8000, debug=True)
