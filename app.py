@@ -184,7 +184,7 @@ def pawan():
     A4_WIDTH = 2480
     A4_HEIGHT = 3508
 
-    IMG_W = 1000
+    IMG_W = 980
     IMG_H = 1300
     GAP = 20
 
