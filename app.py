@@ -1,6 +1,6 @@
 from pdf2image import convert_from_path, convert_from_bytes
 from PIL import Image
-from flask import Flask, send_file, request
+from flask import Flask, render_template, send_file, request
 from flask_cors import CORS
 from io import BytesIO
 import zipfile
@@ -9,9 +9,9 @@ app = Flask(__name__)
 
 CORS(app)
 
-@app.route("/test")
-def test():
-    return "server is running"
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 #for aadhar card
 @app.route("/aadhar", methods=["POST"])
@@ -49,13 +49,8 @@ def aadhar():
     a4_page.save(img_buffer, "JPEG", quality=100)
     img_buffer.seek(0)
 
-    return send_file(img_buffer, mimetype="image/jpeg")
+    return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="aadhar_cards.jpg")
 
-    img_buffer = BytesIO()
-    a4_page.save(img_buffer, "JPEG", quality=100)
-    img_buffer.seek(0)
-
-    return send_file(img_buffer, mimetype="image/jpeg")
 
 #for nsdl pan card
 @app.route("/nsdlPan", methods=["POST"])
@@ -93,7 +88,7 @@ def nsdlPan():
     a4_page.save(img_buffer, "JPEG", quality=100)
     img_buffer.seek(0)
 
-    return send_file(img_buffer, mimetype="image/jpeg")
+    return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="pan_card.jpg")
 
 
 
@@ -133,7 +128,7 @@ def utiPan():
     a4_page.save(img_buffer, "JPEG", quality=100)
     img_buffer.seek(0)
 
-    return send_file(img_buffer, mimetype="image/jpeg")
+    return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="pancard.jpg")
 
 
 #for pvc aadhar card
@@ -284,7 +279,7 @@ def voter():
     a4_page.save(img_buffer, "JPEG", quality=100)
     img_buffer.seek(0)
 
-    return send_file(img_buffer, mimetype="image/jpeg")
+    return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="voter_card.jpg")
 
 
 if __name__ == "__main__":
