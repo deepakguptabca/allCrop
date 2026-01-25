@@ -179,9 +179,9 @@ def pawan():
     A4_WIDTH = 2480
     A4_HEIGHT = 3508
 
-    IMG_W = 943
-    IMG_H = 1277
-    GAP = 40
+    IMG_W = 980
+    IMG_H = 1300
+    GAP = 20
 
     # fixed positions for 2×2 layout
     positions = [
