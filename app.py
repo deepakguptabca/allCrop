@@ -4,14 +4,33 @@ from flask import Flask, render_template, send_file, request
 from flask_cors import CORS
 from io import BytesIO
 import zipfile
+import webbrowser
+import threading
+import os
+import sys
 
-app = Flask(__name__)
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+app = Flask(
+    __name__,
+    template_folder=resource_path("templates"),
+    static_folder=resource_path("static")
+)
+
 
 CORS(app)
 
 @app.route("/")
 def home():
     return render_template("index.html")
+
 
 #for aadhar card
 @app.route("/aadhar", methods=["POST"])
@@ -282,5 +301,9 @@ def voter():
     return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="voter_card.jpg")
 
 
+def open_browser():
+    webbrowser.open("http://127.0.0.1:8000")
+
 if __name__ == "__main__":
-     app.run(host="0.0.0.0", port=8000, debug=True)
+    threading.Timer(1, open_browser).start()
+    app.run(host="127.0.0.1", port=8000, debug=False)
