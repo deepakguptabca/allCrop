@@ -38,7 +38,7 @@ def aadhar():
 
     A4_WIDTH = 2480
     A4_HEIGHT = 3508
-    y = 20
+    y = 60
 
     a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
 
@@ -56,6 +56,13 @@ def aadhar():
             bottom = 3060
 
             cropped = img.crop((left, top, right, bottom))
+
+            scale = 0.95  # 70% of original size
+
+            new_width = int(cropped.width * scale)
+            new_height = int(cropped.height * scale)
+
+            cropped = cropped.resize((new_width, new_height), Image.LANCZOS)
 
             x = (A4_WIDTH - cropped.width) // 2
             a4_page.paste(cropped, (x, y))
