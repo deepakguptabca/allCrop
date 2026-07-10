@@ -10,19 +10,7 @@ import os
 import sys
 
 
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
-
-app = Flask(
-    __name__,
-    template_folder=resource_path("templates"),
-    static_folder=resource_path("static")
-)
+app = Flask(__name__)
 
 
 CORS(app)
@@ -308,9 +296,6 @@ def voter():
     return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="voter_card.jpg")
 
 
-def open_browser():
-    webbrowser.open("http://127.0.0.1:8000")
 
 if __name__ == "__main__":
-    threading.Timer(1, open_browser).start()
-    app.run(host="127.0.0.1", port=8000, debug=False)
+    app.run(host="0.0.0.0", port=8000)
