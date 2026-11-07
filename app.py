@@ -108,7 +108,6 @@ def nsdlPan():
     return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="pan_card.jpg")
 
 
-
 #for uti pan card
 @app.route("/utiPan", methods=["POST"])
 def utiPan():
@@ -188,12 +187,45 @@ def pvcAadhar():
         download_name="aadhar_pvc.zip"
     )
 
+#for ayushman card
+@app.route("/ayushman", methods=["POST"])
+def ayushman():
 
+    A4_WIDTH = 2480
+    A4_HEIGHT = 3508
+    y = 20
 
-from flask import request, send_file, jsonify
-from pdf2image import convert_from_bytes
-from PIL import Image
-from io import BytesIO
+    a4_page = Image.new("RGB", (A4_WIDTH, A4_HEIGHT), "white")
+
+    ayushmanPDF = request.files.getlist("File")
+
+    for pdf in ayushmanPDF:
+        images = convert_from_bytes(pdf.read(), dpi=300, fmt="jpg")
+
+        for i, img in enumerate(images):
+
+            # crop part
+            left = 436
+            top = 395
+            right = 3130
+            bottom = 1039
+
+            cropped = img.crop((left, top, right, bottom))
+            cropped = cropped.resize((2253, 649), Image.Resampling.LANCZOS)
+
+            x = (A4_WIDTH - cropped.width) // 2
+            a4_page.paste(cropped, (x, y))
+            y += cropped.height + 20
+
+            if y + cropped.height > A4_HEIGHT:
+                break
+
+    img_buffer = BytesIO()
+    a4_page.save(img_buffer, "JPEG", quality=100)
+    img_buffer.seek(0)
+
+    return send_file(img_buffer, mimetype="image/jpeg",as_attachment=True,download_name="ayushman.jpg")
+    
 
 #voter card
 @app.route("/voter", methods=["POST"])
